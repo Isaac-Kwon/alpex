@@ -26,7 +26,10 @@ class TRunBulk: public TNamed{
     TRunBulk(const char * name, const char * title);
     // TString          Print();
     virtual Bool_t   LoadRuns(const char * runlistFilename);
-    TRun * At(int i){return (TRun*) fRuns.At(i);}
+    TRun * Get(int i){return (TRun*) fRuns.At(i);}
+    TRun * At(int i){return Get(i);}
+    Int_t  GetSize(){return fRuns.GetSize();}
+    void   Print();
 
     ClassDef(TRunBulk,10);
 };
@@ -124,6 +127,7 @@ Bool_t TRunBulk::LoadRuns(const char * runlistFilename){
         std::string text;
         TRun * run = new TRun(TString::Format("%s_%d", TNamed::GetName(), i), TString::Format("%s_run_%d", TNamed::GetTitle(), i));
         fRuns.AddLast(run);
+        run->fRunBulk = this;
         for(int j=0; std::getline(text_stream, text, '\t'); j++){
             columnPair pair = columns.at(j);
             switch (pair.datatype)
@@ -152,10 +156,13 @@ Bool_t TRunBulk::LoadRuns(const char * runlistFilename){
     return kTRUE;
 }
 
-// TString TRunBulk::Print(){
-//     TString ans = TString();
-
-//     return ans;
-// }
+void TRunBulk::Print(){
+    TNamed::Print();
+    for(Int_t i=0; i<fRuns.GetSize(); i++){
+        std::cout<<"N' of run = "<<i<<std::endl;
+        Get(i)->Print();
+        std::cout<<std::endl;
+    }
+}
 
 #endif
