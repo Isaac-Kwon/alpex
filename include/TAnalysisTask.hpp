@@ -31,6 +31,8 @@ class TAnalysisTask : public TTask{
     virtual void Init(){;}
     virtual void Exec(Option_t *option){;}
     virtual void Save(const char *fname=0, Bool_t closing=kTRUE);
+
+    ClassDef(TAnalysisTask,10);
 };
 
 TAnalysisTask::TAnalysisTask()

@@ -53,6 +53,7 @@ class TAnalysisTaskClustering: public TAnalysisTask{
     virtual void Exec();
     void Save2();
 
+    ClassDef(TAnalysisTaskClustering,10);
 };
 
 TAnalysisTaskClustering::TAnalysisTaskClustering(const char * name, const char * title, const char * inputfname, const char * outputfname)
