@@ -3,18 +3,20 @@
 
 #include "TROOT.h"
 #include "TMath.h"
-// #include "TCluster.hpp"
+#include "TObject.h"
+
 #include "deque"
 
 class TCluster;
 
-class TPixel{
+class TPixel: public TObject{
     private:
     UInt_t x=-1;
     UInt_t y=-1;
     UInt_t t=-1;
     protected:
     public:
+    TPixel();
     TPixel(UInt_t x_, UInt_t y_, UInt_t t_=-1);
     TPixel(const TPixel & pix);
     // TPixel(TPixel pix);
@@ -27,7 +29,15 @@ class TPixel{
     UInt_t GetY(){return y;}
     UInt_t GetT(){return t;}
     TString Print(Bool_t quite=kFALSE);
+
+    ClassDef(TPixel,10);
 };
+
+TPixel::TPixel(){
+    x = -1;
+    y = -1;
+    t = -1;
+}
 
 TPixel::TPixel(UInt_t x_, UInt_t y_, UInt_t t_){
     x = x_;
@@ -36,16 +46,12 @@ TPixel::TPixel(UInt_t x_, UInt_t y_, UInt_t t_){
 }
 
 TPixel::TPixel(const TPixel & pix){
+    // std::cout<<"COPY " << pix.x <<"\t"<<pix.y <<"\t" <<pix.t<<std::endl;
     x = pix.x;
     y = pix.y;
     t = pix.t;
+    // std::cout<<"TPixel::TPixel - Copy Contruction [" << pix.x <<","<< pix.y<<","<<pix.t<< "] to [" <<  x <<","<<  y <<","<< t << "]" <<std::endl;
 }
-
-// TPixel::TPixel(TPixel pix){
-//     x = pix.x;
-//     y = pix.y;
-//     t = pix.t;
-// }
 
 Bool_t TPixel::IsNear(TPixel pix, Double_t distance, Bool_t manhattan){
     //If the pixels are attached in a side (not edge)
@@ -86,7 +92,7 @@ Double_t TPixel::GetEDistance(TPixel pix){ //Eucludian Distance
 }
 
 TString TPixel::Print(Bool_t quite=kFALSE){
-    TString ans = TString::Format("[%d, %d, %d]", t,x,y);
+    TString ans = TString::Format("[%u, %u, %u]", t,x,y);
     if (!quite){
         std::cout<<"TPixel "<<ans << " "<<std::endl;
     }

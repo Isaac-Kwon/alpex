@@ -25,11 +25,13 @@ class TAnalysisTask : public TTask{
     TAnalysisTask();
     TAnalysisTask(const char *name, const char *title);
     TAnalysisTask(const TAnalysisTask &task); 
+    virtual ~TAnalysisTask(); 
 
     //=====================================================================
     // === OVERLOAD THIS AND CREATE YOUR OUTPUT OBJECTS (HISTOGRAMS,DATA) HERE
     virtual void Init(){;}
     virtual void Exec(Option_t *option){;}
+    virtual void Clear();
     virtual void Save(const char *fname=0, Bool_t closing=kTRUE);
 
     ClassDef(TAnalysisTask,10);
@@ -45,6 +47,18 @@ TAnalysisTask::TAnalysisTask(const char *name, const char *title)
 TAnalysisTask::TAnalysisTask(const TAnalysisTask &task)
               :TTask(task)
 {}
+
+TAnalysisTask::~TAnalysisTask(){
+    Clear();
+}
+
+void TAnalysisTask::Clear(){
+    foutputfile->Close();
+    finput->Delete();
+    // foutput->Delete();
+}
+
+
 
 void TAnalysisTask::Save(const char *fname, Bool_t closing){
     
