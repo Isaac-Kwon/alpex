@@ -1,59 +1,9 @@
-#ifndef TANALYSISTASKCLUSTERING_H
-#define TANALYSISTASKCLUSTERING_H 1;
+#include "TAnalysisTaskClustering.hpp"
 
-#include "TROOT.h"
-#include "TString.h"
-#include "TTree.h"
 #include "TH2D.h"
-#include "TCut.h"
 #include "TFile.h"
-
-#include "TAnalysisTask.hpp"
-
-#include "TPixel.hpp"
-#include "TCluster.hpp"
 #include "TEvent.hpp"
-
-class TAnalysisTaskClustering: public TAnalysisTask{
-    private:
-    TFile * finfile = 0;
-    TString finputfname;
-    TString foutputfname;
-    TTree * thit = 0;
-
-    TTree * tevent = 0; //Output 1
-    TTree * tcluster = 0; //Output 2
-    
-    TEventDump eventdump;
-    TClusterDump clusterdump;
-
-    TEvent * RecordingEvent; // Event Structure
-    TH2D * h1 = 0;
-    TH2D * h2 = 0;
-    TH2D * h3 = 0;
-    TH2D * h4 = 0;
-    struct RStruct{
-        UChar_t  chipid;
-        UInt_t   t;
-        UShort_t x;
-        UShort_t y;
-    };
-    RStruct read;
-
-    void    RecordEvent(TEvent * event);
-
-    protected:
-    public:
-    TAnalysisTaskClustering(const char * name, const char * title, const char * inputfname, const char * outputfname);
-    TAnalysisTaskClustering(const char * inputfname, const char * outputfname);
-    // ~TAnalysisTaskClustering();
-    void Clear();
-    virtual void Init();
-    virtual void Exec(Int_t verbose=-1);
-    // void Save();
-
-    ClassDef(TAnalysisTaskClustering,10);
-};
+#include "TTimeStamp.h"
 
 TAnalysisTaskClustering::TAnalysisTaskClustering(const char * name, const char * title, const char * inputfname, const char * outputfname)
                          :TAnalysisTask(name,title),
@@ -164,25 +114,41 @@ void TAnalysisTaskClustering::Init(){
     foutput->Add(h4);
 }
 
-void TAnalysisTaskClustering::Exec(Int_t verbose){
+void TAnalysisTaskClustering::Exec(Int_t verbose, Int_t ratio){
     thit->GetEntry(0);
     UInt_t t_prev = read.t;
     TEvent * event = RecordingEvent;
-    Int_t nentries = thit->GetEntries();
+    Int_t nentries = thit->GetEntries() / ratio;
+    TTimeStamp starttime = TTimeStamp();
+
+    std::cout << "Started at " << starttime.AsString() << std::endl;
+
     for(Int_t i=0; i<nentries; i++){
         thit->GetEntry(i);
-        if(t_prev != read.t){
-            event->Clustering();
+        if(t_prev != read.t || i==nentries-1){
+            if(i==nentries-1){
+                event->Append(TPixel(read.x, read.y, read.t));
+            }
+
+            event->Clustering(fDistance);
             RecordEvent(event);
-            // break;
+            
         }
         t_prev = read.t;
         event->Append(TPixel(read.x, read.y, read.t));
         if(verbose>=1 && i%verbose==0){
+            TTimeStamp nowtime = TTimeStamp();
+            Double_t timeelp = nowtime - starttime;
+            Double_t ratio = (Float_t(i)/Float_t(nentries));
+            Double_t timeest = timeelp/ratio;
             std::cout<< i << "\t/\t" << nentries <<
-                "  ("<<TString::Format("%.2f", Float_t(i*100)/nentries)<<")\tt=" << read.t <<"\t Now n=\t" << tcluster->GetEntries() << std::endl;
+                "  ("<<TString::Format("%.2f", Float_t(i*100)/nentries)<<")\tt=" << read.t <<"\t Now n=\t" << tcluster->GetEntries() << " | " << timeelp <<" s. / " << timeest << " s. est. :: " << timeest - timeelp << " sec remained." << std::endl;
         }
     }
+
+    TTimeStamp endtime = TTimeStamp();
+    std::cout << "Finished at " << endtime.AsString() <<std::endl;
+    std::cout << "Total elapsed time : " << starttime - endtime << " sec." << std::endl;
 
     tcluster->Draw("y:x >> h1", "", "goff");
     tcluster->Draw("cluster.centery:cluster.centerx >> h2", "", "goff");
@@ -192,8 +158,15 @@ void TAnalysisTaskClustering::Exec(Int_t verbose){
 }
 
 void TAnalysisTaskClustering::RecordEvent(TEvent * event){
-
+    // std::cout<<"TEventClustering::RecordEvent at ptr\t"<<RecordingEvent<<std::endl;
+    // RecordingEvent->Print();
     // std::cout<<"DumpCluster"<<std::endl;
+    // if(RecordingEvent==nullptr){
+    //     event->Clear();
+    //     std::cout<<"TAnalysisTaskClustering::RecordEvent - RecordingEvent is nullptr, ignored"<<std::endl;
+    //     return;
+    // }
+    
     for(Int_t i=0; i<RecordingEvent->GetNCluster(); i++){
         // std::cout<<"Cluster N\'\t"<<i<<std::endl;
         RecordingEvent->GetCluster(i)->Dump(clusterdump);
@@ -206,5 +179,3 @@ void TAnalysisTaskClustering::RecordEvent(TEvent * event){
     event->Clear();
 }
 
-
-#endif
