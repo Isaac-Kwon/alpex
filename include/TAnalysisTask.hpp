@@ -1,18 +1,15 @@
-#ifndef TANALYSISTASK_H
-#define TANALYSISTASK_H 1;
+#ifndef __TANALYSISTASK__
+#define __TANALYSISTASK__
 
 #include "TROOT.h"
 #include "TTask.h"
-#include "TDirectory.h"
-#include "TObjArray.h"
+#include "TObject.h"
 #include "TFile.h"
-#include "TKey.h"
 
-#include "TCluster.hpp"
-#include "TEvent.hpp"
-#include "TPixel.hpp"
+class TFile;
+class TObjArray;
 
-class TAnalysisTask : public TTask{
+class TAnalysisTask{
     private:
 
     protected:
@@ -21,6 +18,7 @@ class TAnalysisTask : public TTask{
 
     TFile * foutputfile;
 
+    TString fname, ftitle;
     public:
     TAnalysisTask();
     TAnalysisTask(const char *name, const char *title);
@@ -30,51 +28,50 @@ class TAnalysisTask : public TTask{
     //=====================================================================
     // === OVERLOAD THIS AND CREATE YOUR OUTPUT OBJECTS (HISTOGRAMS,DATA) HERE
     virtual void Init(){;}
-    virtual void Exec(Option_t *option){;}
+    virtual void Exec(){;}
     virtual void Clear();
     virtual void Save(const char *fname=0, Bool_t closing=kTRUE);
 
-    ClassDef(TAnalysisTask,10);
+    // ClassDef(TAnalysisTask,1);
 };
 
-TAnalysisTask::TAnalysisTask()
-{}
+// TAnalysisTask::TAnalysisTask()
+// {}
 
-TAnalysisTask::TAnalysisTask(const char *name, const char *title)
-              :TTask(name, title)
-{}
+// TAnalysisTask::TAnalysisTask(const char *name, const char *title)
+//               :TTask(name, title)
+// {}
 
-TAnalysisTask::TAnalysisTask(const TAnalysisTask &task)
-              :TTask(task)
-{}
+// TAnalysisTask::TAnalysisTask(const TAnalysisTask &task)
+//               :TTask(task)
+// {}
 
-TAnalysisTask::~TAnalysisTask(){
-    Clear();
-}
+// TAnalysisTask::~TAnalysisTask(){
+//     Clear();
+// }
 
-void TAnalysisTask::Clear(){
-    foutputfile->Close();
-    finput->Delete();
-    // foutput->Delete();
-}
+// void TAnalysisTask::Clear(){
+//     foutputfile->Close();
+//     finput->Delete();
+//     // foutput->Delete();
+// }
 
-
-
-void TAnalysisTask::Save(const char *fname, Bool_t closing){
+// void TAnalysisTask::Save(const char *fname, Bool_t closing){
     
-    foutput->Print();
+//     foutput->Print();
 
-    if(foutputfile==nullptr){
-        if(fname == 0){
-            foutputfile = new TFile("taskresult.root", "RECREATE");
-        }else{
-            foutputfile = new TFile(fname, "RECREATE");
-        }
-    }
+//     if(foutputfile==nullptr){
+//         if(fname == 0){
+//             foutputfile = new TFile("taskresult.root", "RECREATE");
+//         }else{
+//             foutputfile = new TFile(fname, "RECREATE");
+//         }
+//     }
 
-    foutputfile->cd();
-    foutputfile->Add(foutput->Clone(),kTRUE);
-    foutputfile->Write();
-};
+//     foutputfile->cd();
+//     foutputfile->Add(foutput->Clone(),kTRUE);
+//     foutputfile->Write();
+// };
+
 
 #endif
