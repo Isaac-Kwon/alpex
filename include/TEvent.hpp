@@ -9,8 +9,8 @@
 #include "TPixel.hpp"
 #include "TCluster.hpp"
 
-#define CLUSTERMAX 100
-#define PIXELMAX   500
+#define CLUSTERMAX 1000
+#define PIXELMAX   1000
 
 class TEventDump{
     public:
@@ -22,7 +22,6 @@ class TEventDump{
     UShort_t npixel=0;
     UShort_t ncluster=0;
     void Print(){
-        
     }
 };
 class TEvent{
@@ -60,6 +59,7 @@ class TEvent{
     TPixel    PopFrontPixel();
     TPixel    PopBackPixel();
     TPixel    PopPixel(Int_t pixn);
+    TCluster *PopCluster(Int_t clusn);
     // TCluster *PopFrontCluster;
     Bool_t    IsInside(TPixel pix);
     Bool_t    IsInside(TCluster * cluster);

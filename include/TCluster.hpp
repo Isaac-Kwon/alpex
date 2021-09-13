@@ -6,7 +6,7 @@
 #include "TClonesArray.h"
 #include "deque"
 
-#define CLUSTERMAX 100
+#define PIXCLUSTERMAX 500
 
 // class TClonesArray;
 // class TPixel;
@@ -22,10 +22,17 @@ struct TClusterDump{
     Bool_t  coreless=kFALSE;
 
     Int_t t = -1;
-    UShort_t x[CLUSTERMAX];
-    UShort_t y[CLUSTERMAX];
+    UShort_t x[PIXCLUSTERMAX];
+    UShort_t y[PIXCLUSTERMAX];
+    UShort_t noise[PIXCLUSTERMAX];
     UShort_t n       = 0;
+
+    // Int_t noise=0;
+
 };
+
+template <typename L, typename T> class TMap2Base;
+
 class TCluster{
     private:
     std::deque<TPixel> fPixes;
@@ -65,7 +72,7 @@ class TCluster{
     Bool_t IsCoreless();
     Bool_t operator==(TCluster cluster);
     virtual TString Print(Bool_t quite=kFALSE);
-    virtual void   Dump(TClusterDump &dump);
+    virtual void   Dump(TClusterDump &dump, TMap2Base<Short_t, Int_t>* noisemap = nullptr);
 
 };
 

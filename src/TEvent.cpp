@@ -32,15 +32,6 @@ TEvent::~TEvent(){
 }
 
 void TEvent::Append(TPixel pix){
-    // std::cout<<"AppendPixel"<<std::endl;
-    // std::cout<<pix.Print(true)<<"\t to \t"<<fPixes<<std::endl;
-    // fPixes->Compress();
-    // std::cout<<"ORIGINAL"<<std::endl;
-    // pix.Print();
-    // TPixel * pixx= new TPixel(pix);
-    // std::cout<<"COPIED"<<std::endl;
-    // pixx->Print();
-    // fPixes->operator[](fNPixes) = pixx;
     fPixes.emplace_back(pix);
     fNPixes++;
     fMaynotclustered = kTRUE;
@@ -48,17 +39,9 @@ void TEvent::Append(TPixel pix){
 }
 
 void TEvent::Append(TCluster* cluster){
-    // std::cout<<"AppendCluster"<<std::endl;
-// fClusters->Compress();
-    // std::cout<<"1"<<std::endl;
-    // std::cout<<"2"<<std::endl;
-    // fClusters->operator[](fNClusters) = new TCluster(cluster);
     fClusters.emplace_back(cluster);
-    // std::cout<<"3"<<std::endl;
     fNClusters++;
-    // std::cout<<"4"<<std::endl;
     fMaynotclustered = kTRUE;
-    // std::cout<<"5"<<std::endl;
     if(fAutocluster) Clustering(kTRUE);
 }
 
@@ -78,7 +61,6 @@ void TEvent::Clustering(Double_t distance, Bool_t setautocluster){
 
     if(fNClusters==0){
         Append(new TCluster(PopFrontPixel())); //Initilize the event
-        
     }else if(fNClusters>0){ // dissociate all of clusters
         for(Int_t i=0; fNClusters>1; i++){
             TCluster * cluster = GetCluster(1);
@@ -104,21 +86,16 @@ void TEvent::Clustering(Double_t distance, Bool_t setautocluster){
             Int_t j=0;
             for(j=0; j<fNClusters; j++){
                 if(GetCluster(j)->Append(pix,distance)){
-                    // std::cout<<"Pixel ["<<i<<"] =" << pix.Print(kTRUE) <<" is clustered"<<std::endl;
-                    // Print();
                     clusteredp = kTRUE;
                     clustered  = kTRUE;
                     break;
                 }
             }
             if(clusteredp){
-                // std::cout<<"Pixel ["<<j<<"] =" <<
-                PopPixel(i);//.Print(kTRUE)
-                // <<" is poped"<<std::endl;
+                PopPixel(i);
                 break;
             }
         }
-        // std::cout<<std::endl;
 
         if(fNPixes>0 && !clustered){
             Append(new TCluster(PopFrontPixel()));
@@ -181,6 +158,22 @@ TPixel TEvent::PopPixel(Int_t pixn){
 TPixel TEvent::PopBackPixel(){
     // std::cout<<"POPFRONTPIXEL"<<std::endl;
     return PopPixel(-1);
+}
+
+TCluster* TEvent::PopCluster(Int_t clusn){
+    TCluster* ans = GetCluster(clusn);
+    // delete GetPixelPtr(pixn);
+    // fPixes->RemoveAt(pixn);
+    // fPixes->Compress();
+    if(clusn>=0){
+        if(fNClusters < clusn) return new TCluster();
+        fClusters.erase(fClusters.begin()+clusn);
+    }else{
+        if(fNClusters <= -1*clusn) return new TCluster();
+        fClusters.erase(fClusters.end()+clusn);
+    }
+    fNClusters--;
+    return ans;
 }
 
 Bool_t TEvent::IsInside(TPixel pix){

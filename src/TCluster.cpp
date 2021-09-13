@@ -10,6 +10,7 @@
 #include "TPixel.hpp"
 #include "iostream"
 #include "deque"
+#include "TMap2Base.hpp"
 
 // #if !defined(__CLING__)
 // ClassImp(TCluster)
@@ -92,7 +93,7 @@ Bool_t TCluster::Append(TCluster cluster, Double_t distance){
     return kTRUE;
 }
 
-void   TCluster::ConfirmAppend(TPixel pix){
+void TCluster::ConfirmAppend(TPixel pix){
     Compress();
     fPixes.emplace_back(pix);
     fNPixes++;
@@ -272,7 +273,7 @@ TString TCluster::Print(Bool_t quite){
     return ans;
 }
 
-void TCluster::Dump(TClusterDump &dump){
+void TCluster::Dump(TClusterDump &dump, TMap2Base<Short_t, Int_t>* noisemap){
     // std::cout<<"TCluster::Dump - Start"<<std::endl;
      
     dump.t = GetPixel(0).GetT();
@@ -288,6 +289,10 @@ void TCluster::Dump(TClusterDump &dump){
         TPixel pix = GetPixel(i);
         dump.x[i] = pix.GetX();
         dump.y[i] = pix.GetY();
+
+        if(noisemap!=nullptr){
+            dump.noise[i] = noisemap->At(pix.GetX(), pix.GetY());
+        }
 
         // std::cout<<"TCluster::Dump - DUMP PIXEL No."<<i<<"\t"<<"["<< dump.x[i] << "," << dump.y[i] <<"]"<<std::endl;
 

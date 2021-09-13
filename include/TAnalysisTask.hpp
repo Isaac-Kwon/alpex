@@ -16,6 +16,7 @@ class TAnalysisTask{
     TObjArray * finput;
     TObjArray * foutput;
 
+    TFile * finputfile;
     TFile * foutputfile;
 
     TString fname, ftitle;
