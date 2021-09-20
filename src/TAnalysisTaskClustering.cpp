@@ -105,6 +105,7 @@ void TAnalysisTaskClustering::Init(){
     tevent->Branch("pixely", eventdump.y, "y[npixel]/s");
     tevent->Branch("clusterx", eventdump.centerx, "centerx[ncluster]/s");
     tevent->Branch("clustery", eventdump.centery, "centery[ncluster]/s");
+    tevent->Branch("npixcluster", eventdump.npixcluster, "npixcluster[ncluster]/s");
     
     h1               = new TH2D("h1", "Hitmap", 1024, 0, 1024, 512, 0, 512);
     h1->GetXaxis()->SetTitle("PixelX");
@@ -221,8 +222,6 @@ void TAnalysisTaskClustering::Exec(Int_t verbose, Int_t ratio){
     tcluster->Draw("y:x >> h1", "", "goff");
     tcluster->Draw("cluster.centery:cluster.centerx >> h2", "", "goff");
     tcluster->Draw("cluster.centery:cluster.centerx >> h4", "", "goff");
-    // tevent->Print();
-    // tcluster->Print();
 }
 
 void TAnalysisTaskClustering::RecordEvent(TEvent * event){
@@ -244,28 +243,15 @@ void TAnalysisTaskClustering::RecordEvent(TEvent * event){
     // }
 
     Bool_t startdebug = kFALSE;
-    // if(event->GetCluster(0)->GetPixel(0).GetT() > 7820) startdebug = kTRUE;
 
-    // if(startdebug) std::cout<<"DEBUG S" << event->GetCluster(0)->GetPixel(0).GetT() <<std::endl;
-    // if(startdebug) std::cout<<"DEBUG 0"<<std::endl;
     for(Int_t i=0; i<RecordingEvent->GetNCluster(); i++){
-        // std::cout<<"Cluster N\'\t"<<i<<std::endl;
         TCluster * cluster = RecordingEvent->GetCluster(i);
-        // if(startdebug) std::cout<<"CLU "<< cluster->GetNPixel() <<std::endl;
         cluster->Dump(clusterdump, fNoiseMap);
-        // if(startdebug) std::cout<<"CLU FILL"<<std::endl;
         tcluster->Fill();
-        // if(startdebug) std::cout<<"CLU FILLED"<<std::endl;
     }
-    // std::cout<<"DumpEvent"<<std::endl;
-    // if(tevent->get)
-    // if(startdebug) std::cout<<"DEBUG 1"<<std::endl;
     RecordingEvent->Dump(eventdump);
-    // if(startdebug) std::cout<<"DEBUG 2"<<std::endl;
     tevent->Fill();
-    // if(startdebug) std::cout<<"DEBUG 3"<<std::endl;
     event->Clear();
-    // if(startdebug) std::cout<<"DEBUG 4-END"<<std::endl;
 }
 
 void TAnalysisTaskClustering::Save(const char *fname, Bool_t closing){

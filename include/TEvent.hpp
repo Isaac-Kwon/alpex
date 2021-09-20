@@ -19,6 +19,7 @@ class TEventDump{
     UShort_t y[PIXELMAX];
     UShort_t centerx[CLUSTERMAX];
     UShort_t centery[CLUSTERMAX];
+    UShort_t npixcluster[CLUSTERMAX];
     UShort_t npixel=0;
     UShort_t ncluster=0;
     void Print(){

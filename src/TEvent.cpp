@@ -238,41 +238,32 @@ void TEvent::Dump(TEventDump& dump){
     //     UShort_t y[PIXELMAX];
     //     UShort_t centerx[CLUSTERMAX];
     //     UShort_t centery[CLUSTERMAX];
+    //     UShort_t npixcluster[CLUSTERMAX];
     //     UShort_t npixel=0;
     //     UShort_t ncluster=0;
     // };
     // std::cout<<"TEvent::Dump - Start"<<std::endl;
 
     if(GetNPixelUnclustered()!=0){
-        // std::cout<<"TEvent::Dump - with condition npixel!=0"<<std::endl;
         dump.t = GetPixel(0).GetT();
     }else if(GetNCluster()!=0){
-        // std::cout<<"TEvent::Dump - with condition ncluster!=0"<<std::endl;
         dump.t = GetCluster(0)->GetPixel(0).GetT();
     }
-
-    // std::cout<<"TEvent::Dump - t="<<dump.t<<std::endl;
 
     Int_t pixn=0;
     for(Int_t i=0; i<GetNCluster(); i++){
         TCluster * cluster = GetCluster(i);
-        // std::cout<<"Will be dump \t" << cluster->GetNPixel() <<"\t pixels"<< std::endl;
         for(Int_t j=0; j<cluster->GetNPixel(); j++){
             TPixel pix = cluster->GetPixel(j);
-            // std::cout<<"Dump Pixel in cluster " <<i<<"\t"<<j<<std::endl;
             dump.x[pixn] = pix.GetX();
             dump.y[pixn] = pix.GetY();
-            // std::cout<<"TEvent::Dump - DUMP PIXEL No."<<pixn<<"\t"<<"["<< dump.x[pixn] << "," << dump.y[pixn] <<"]"<<std::endl;
             pixn++;
         }
         dump.centerx[i] = cluster->GetCenterX();
         dump.centery[i] = cluster->GetCenterY();
-        // std::cout<<"TEvent::Dump - DUMP ClusterCentre No."<<i<<"\t"<<"["<< dump.centerx[i] << "," << dump.centery[i] <<"]"<<std::endl;
+        dump.npixcluster[i] = cluster->GetNPixel();
     }
     dump.npixel = pixn;
     dump.ncluster = GetNCluster();
-
-    // std::cout<<"TCluster::Dump - npixel="<< (UInt_t) dump.npixel <<std::endl;
-    // std::cout<<"TCluster::Dump - ncluster="<< (UInt_t) dump.ncluster <<std::endl;
 }
 
